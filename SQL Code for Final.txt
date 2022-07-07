@@ -1,0 +1,92 @@
+CREATE DATABASE jaunty_coffee_co;
+
+CREATE TABLE employee(
+    employee_id INT,
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
+    hire_date DATE,
+    job_title VARCHAR(30),
+    shop_id INT,
+    PRIMARY KEY(employee_id)
+);
+
+CREATE TABLE coffee_shop(
+    shop_id INT,
+    shop_name VARCHAR(50),
+    city VARCHAR(50),
+    state CHAR(2),
+    PRIMARY KEY(shop_id)
+);
+
+CREATE TABLE coffee(
+    coffee_id INT,
+    shop_id INT,
+    supplier_id INT,
+    coffee_name VARCHAR(30),
+    price_per_pound NUMERIC(5,2),
+    PRIMARY KEY(coffee_id)
+);
+
+CREATE TABLE supplier(
+    supplier_id INT,
+    company_name VARCHAR(50),
+    country VARCHAR(30),
+    sales_contact_name VARCHAR(60),
+    email VARCHAR(50) NOT NULL,
+    PRIMARY KEY(supplier_id)
+);
+
+ALTER TABLE employee
+    ADD FOREIGN KEY (shop_id) REFERENCES coffee_shop(shop_id) ON DELETE SET NULL;
+
+ALTER TABLE coffee
+    ADD FOREIGN KEY (shop_id) REFERENCES coffee_shop(shop_id) ON DELETE SET NULL,
+    ADD FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id) ON DELETE SET NULL;
+
+INSERT INTO coffee_shop
+    VALUES  (1, 'Java Town', 'Denver', 'CO'),
+            (2, 'Coffee Palace', 'Colorado Springs', 'CO'),
+            (3, 'Coffee-Rama', 'Rancho Cucamonga', 'CA');
+
+INSERT INTO supplier
+    VALUES  (1, 'Coffee Company', 'USA', 'Jim Bob', 'jbob@hotmail.com'),
+            (2, 'World Coffee', 'Nicaragua', 'Pedro Sandoval', 'psandoval@aol.com'),
+            (3, 'Enchanted Grounds', 'UK', 'Bill Maker', 'bmaker@coffee.com');
+
+INSERT INTO employee
+    VALUES  (1, 'Richard', 'Mafera', '2013-06-13', 'owner', 1),
+            (2, 'Sanna', 'Deerrose', '2013-06-13', 'owner', 2),
+            (3, 'Jimmy', 'Page', '2015-09-15', 'manager', 3);
+
+INSERT INTO coffee
+    VALUES  (1, 1, 1, 'Dark Roast', 12.59),
+            (2, 2, 2, 'Medium Roast', 13.67),
+            (3, 3, 3, 'Light Roast', 9.99);
+
+CREATE VIEW employee_information AS
+    SELECT *, CONCAT(first_name, ' ', last_name) AS employee_full_name
+    FROM employee;
+
+CREATE VIEW employee_information_2 AS
+    SELECT employee_id, 
+        CONCAT(first_name, ' ', last_name) AS employee_full_name,
+        hire_date,
+        job_title,
+        shop_id
+    FROM employee;
+
+CREATE INDEX index_coffee_name
+    ON coffee(coffee_name);
+
+SELECT shop_name
+FROM coffee_shop
+WHERE shop_id = 3;
+
+DROP VIEW employee_information;
+
+SELECT *
+FROM employee
+JOIN coffee_shop
+    ON employee.shop_id = coffee_shop.shop_id
+JOIN coffee
+    ON coffee_shop.shop_id = coffee.shop_id;
